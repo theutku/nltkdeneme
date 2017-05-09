@@ -1,64 +1,6 @@
-# from nltk.tokenize import sent_tokenize, word_tokenize
-# from nltk.corpus import stopwords
-
-# stops = set(stopwords.words('english'))
-
-# phrase = "Uncertainty about who will lead Brexit divorce talks for
-# Britain is a very real problem, the diplomat who helped draft article 50
-# has said, as he warned the UK faces a 45% chance of crashing out of the
-# EU with no deal."
-
-# words = word_tokenize(phrase)
-
-# for word in sent_tokenize(phrase):
-#     print(word)
-
-# filtered = []
-
-# for word in words:
-#     if word not in stops:
-#         filtered.append(word)
-
-# print('Filtered Sentence: \n', filtered)
-
-# filtered_stops = [word for word in words if word in stops]
-# print('Filtered Stops: \n', filtered_stops)
-
-# import nltk
-# from nltk.tokenize import PunktSentenceTokenizer
-# from nltk.corpus import state_union
-
-
-# train = state_union.raw('2005-GWBush.txt')
-# sample = state_union.raw('2006-GWBush.txt')
-
-# custom_tokenizer = PunktSentenceTokenizer(train)
-
-# tokenized = custom_tokenizer.tokenize(sample)
-
-
-# def process_tokenized():
-#     try:
-#         for sentence in tokenized[:10]:
-#             words = nltk.word_tokenize(sentence)
-#             tags = nltk.pos_tag(words)
-
-#             # # Chunking
-#             # chunk_gram = """Chunk: {<RB.?>?<VB.?>?<NNP>+<NN>?} """
-#             # chunk_parser = nltk.RegexpParser(chunk_gram)
-#             # chunked = chunk_parser.parse(tags)
-#             # chunked.draw()
-
-#             # # Named Entities
-#             # named_entities = nltk.ne_chunk(tags)
-#             # named_entities.draw()
-#     except Exception as e:
-#         print(str(e))
-
-
-# process_tokenized()
-
 import random
+from statistics import mode
+
 import nltk
 from nltk.corpus import movie_reviews
 from nltk.classify.scikitlearn import SklearnClassifier
@@ -69,31 +11,37 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.svm import SVC, LinearSVC, NuSVC
 
 from nltk.classify import ClassifierI
-from statistics import mode
 
 
 class VoteClassifier(ClassifierI):
 
+    def __init__(self, *classifiers):
+        self._classifiers = classifiers
+
     def classify(self, features):
         votes = []
-        for classifier in self._classifiers:
-            vote = classifier.classify(features)
+        for c in self._classifiers:
+            vote = c.classify(features)
             votes.append(vote)
 
-        return mode(votes)
+        try:
+            md = mode(votes)
+            return md
+        except:
+            return 'Classification Draw!'
 
     def confidence(self, features):
         votes = []
-        for classifier in self._classifiers:
-            vote = classifier.classify(features)
+        for c in self._classifiers:
+            vote = c.classify(features)
             votes.append(vote)
 
-        choice_votes = votes.count(mode(votes))
-        conf = choice_votes / len(votes)
-        return conf
-
-    def __init__(self, *classifiers):
-        self._classifiers = classifiers
+        try:
+            choice_votes = votes.count(mode(votes))
+            confid = float(choice_votes) / len(votes)
+            return confid
+        except:
+            return 'Confidence Draw!'
 
 
 documents = []
@@ -200,10 +148,11 @@ voted_classifier = VoteClassifier(classifier, multinomial_classifier, bernoulli_
 
 
 print('Voted Classifier Accuracy: ',
-      (nltk.classify.accuracy(voted_classifier, testing_set) * 100))
+      (nltk.classify.accuracy(voted_classifier, testing_set)) * 100)
 
 
-print('Classification: ', (voted_classifier.classify(
-    testing_set[0][0]) * 100))
+print('Classification: {} with Confidence: {} %'.format(voted_classifier.classify(
+    testing_set[1][0]), voted_classifier.confidence(testing_set[1][0]) * 100))
 
-print('Confidence: ', (voted_classifier.confidence(testing_set[0][0]) * 100))
+print('Classification: {} with Confidence: {} %'.format(voted_classifier.classify(
+    'This is not so amusing'), voted_classifier.confidence('This is not so amusing') * 100))
