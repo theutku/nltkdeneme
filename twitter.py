@@ -137,25 +137,24 @@ nusvc_classifier = {'name': 'NuSVC Naive Bayes Classifier',
                     'classifier': SklearnClassifier(NuSVC())}
 
 
+classifiers = [classifier, multinomial_classifier, bernoulli_classifier, logistic_classifier,
+               sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier]
+
+
+for classifier in classifiers:
+    classifier['classifier'].train(training_set)
+    print('{} Accuracy: {} %'.format(
+        classifier['name'], (nltk.classify.accuracy(classifier['classifier'], testing_set)) * 100))
+
+
 # Voting with Classifiers
 
 voted_classifier = {'name': 'Voted Classifier', 'classifier': VoteClassifier(classifier, multinomial_classifier, bernoulli_classifier,
                                                                              logistic_classifier, sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier)}
 
-
-classifiers = [classifier, multinomial_classifier, bernoulli_classifier, logistic_classifier,
-               sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier, voted_classifier]
-
-
-for classifier in classifiers:
-    if classifier['name'] != 'Voted Classifier':
-        classifier['classifier'].train(training_set)
-    print('{} Accuracy: {} %'.format(
-        classifier['name'], (nltk.classify.accuracy(classifier['classifier'], testing_set)) * 100))
-    if classifier['name'] == 'Voted Classifier':
-        for feature_set in feature_sets[:10]:
-            print('{} || Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
-                feature_set[0]), voted_classifier['classifier'].confidence(feature_set[0]) * 100))
+for feature_set in feature_sets[:10]:
+    print('{} || Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
+        feature_set[0]), voted_classifier['classifier'].confidence(feature_set[0]) * 100))
 
 
 def analyze_sentiment(text):
