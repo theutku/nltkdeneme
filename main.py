@@ -77,8 +77,8 @@ def find_features(document):
     return features
 
 
-feature_sets = [(find_features(rev), category)
-                for (rev, category) in documents]
+feature_sets = [(find_features(rev_words), category)
+                for (rev_words, category) in documents]
 
 
 training_set = feature_sets[10:1900]

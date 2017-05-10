@@ -22,7 +22,7 @@ class VoteClassifier(ClassifierI):
     def classify(self, features):
         votes = []
         for c in self._classifiers:
-            vote = c.classify(features)
+            vote = c['classifier'].classify(features)
             votes.append(vote)
 
         try:
@@ -34,7 +34,7 @@ class VoteClassifier(ClassifierI):
     def confidence(self, features):
         votes = []
         for c in self._classifiers:
-            vote = c.classify(features)
+            vote = c['classifier'].classify(features)
             votes.append(vote)
 
         try:
@@ -45,61 +45,51 @@ class VoteClassifier(ClassifierI):
             return 'Confidence Draw!'
 
 
-# documents = []
-
-# for category in movie_reviews.categories():
-#     for fileid in movie_reviews.fileids(category):
-#         documents.append((list(movie_reviews.words(fileid)), category))
-
-# random.shuffle(documents)
-# # print(documents[1])
-
-# all_words = []
-
-# for word in movie_reviews.words():
-#     all_words.append(word.lower())
-
-documents = []
-
 short_pos = open('short_reviews/positive.txt', 'rb').read()
 short_neg = open('short_reviews/negative.txt', 'rb').read()
 
 short_pos = short_pos.decode('utf8', 'ignore')
 short_neg = short_neg.decode('utf8', 'ignore')
 
+documents = []
+all_words = []
+
+allowed_word_types = ['J']
+
 for review in short_pos.split('\n'):
+    documents.append((review, 'pos'))
     words = word_tokenize(review)
-    documents.append((words, 'pos'))
+    pos = nltk.pos_tag(words)
+    for word in pos:
+        if word[1][0] in allowed_word_types:
+            all_words.append(word[0].lower())
 
 for review in short_neg.split('\n'):
+    documents.append((review, 'neg'))
     words = word_tokenize(review)
-    documents.append((words, 'neg'))
+    pos = nltk.pos_tag(words)
+    for word in pos:
+        if word[1][0] in allowed_word_types:
+            all_words.append(word[0].lower())
 
+
+# short_pos.close()
+# short_neg.close()
 
 random.shuffle(documents)
 
-all_words = []
-
-short_pos_words = word_tokenize(short_pos)
-short_neg_words = word_tokenize(short_neg)
-
-for word in short_pos_words:
-    all_words.append(word.lower())
-
-for word in short_neg_words:
-    all_words.append(word.lower())
-
 word_freq = nltk.FreqDist(all_words)
 
-# word_features = list(word_freq.keys())[:3000]
+
 word_features = [word for (word, count) in word_freq.most_common(4000)]
 
 
 def find_features(document):
-    words = set(document)
+    words = word_tokenize(document)
+    word_set = set(words)
     features = {}
     for word in word_features:
-        features[word] = (word in words)
+        features[word] = (word in word_set)
 
     return features
 
@@ -108,78 +98,71 @@ feature_sets = [(find_features(rev), category)
                 for (rev, category) in documents]
 
 
-training_set = feature_sets[10:10000]
+training_set = feature_sets[10: 10000]
 testing_set = feature_sets[10000:]
 
 
 # Classifiers
-classifier = nltk.NaiveBayesClassifier.train(training_set)
+classifier = {'name': 'Original Naive Bayes Classifier',
+              'classifier': nltk.NaiveBayesClassifier.train(training_set)}
 
 print('Most Distinctive Keywords: ')
-classifier.show_most_informative_features(15)
-
-print('Original Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(classifier, testing_set)) * 100)
+classifier['classifier'].show_most_informative_features(15)
 
 
-multinomial_classifier = SklearnClassifier(MultinomialNB())
-multinomial_classifier.train(training_set)
-print('Multinomial Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(multinomial_classifier, testing_set)) * 100)
+multinomial_classifier = {'name': 'Multinomial Naive Bayes Classifier',
+                          'classifier': SklearnClassifier(MultinomialNB())}
 
 
-# gaussian_classifier = SklearnClassifier(GaussianNB())
-# gaussian_classifier.train(training_set)
-# print('Gaussian Naive Bayes Classifier Accuracy: ',
-#       (nltk.classify.accuracy(gaussian_classifier, testing_set)) * 100)
+bernoulli_classifier = {'name': 'Bernoulli Naive Bayes Classifier',
+                        'classifier': SklearnClassifier(BernoulliNB())}
 
 
-bernoulli_classifier = SklearnClassifier(BernoulliNB())
-bernoulli_classifier.train(training_set)
-print('Bernoulli Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(bernoulli_classifier, testing_set)) * 100)
+logistic_classifier = {'name': 'Logistic Regression Naive Bayes Classifier',
+                       'classifier': SklearnClassifier(LogisticRegression())}
 
 
-logistic_classifier = SklearnClassifier(LogisticRegression())
-logistic_classifier.train(training_set)
-print('Logistic Regression Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(logistic_classifier, testing_set)) * 100)
+sgd_classifier = {'name': 'SGD Naive Bayes Classifier',
+                  'classifier': SklearnClassifier(SGDClassifier())}
 
 
-sgd_classifier = SklearnClassifier(SGDClassifier())
-sgd_classifier.train(training_set)
-print('SGD Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(sgd_classifier, testing_set)) * 100)
+svc_classifier = {'name': 'SVC Naive Bayes Classifier',
+                  'classifier':  SklearnClassifier(SVC())}
 
 
-svc_classifier = SklearnClassifier(SVC())
-svc_classifier.train(training_set)
-print('SVC Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(svc_classifier, testing_set)) * 100)
+linear_classifier = {'name': 'Linear SVC Naive Bayes Classifier',
+                     'classifier': SklearnClassifier(LinearSVC())}
 
-
-linear_classifier = SklearnClassifier(LinearSVC())
-linear_classifier.train(training_set)
-print('Linear SVC Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(linear_classifier, testing_set)) * 100)
-
-
-nusvc_classifier = SklearnClassifier(NuSVC())
-nusvc_classifier.train(training_set)
-print('NuSVC Naive Bayes Classifier Accuracy: ',
-      (nltk.classify.accuracy(nusvc_classifier, testing_set)) * 100)
+nusvc_classifier = {'name': 'NuSVC Naive Bayes Classifier',
+                    'classifier': SklearnClassifier(NuSVC())}
 
 
 # Voting with Classifiers
 
-voted_classifier = VoteClassifier(classifier, multinomial_classifier, bernoulli_classifier,
-                                  logistic_classifier, sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier)
+voted_classifier = {'name': 'Voted Classifier', 'classifier': VoteClassifier(classifier, multinomial_classifier, bernoulli_classifier,
+                                                                             logistic_classifier, sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier)}
 
 
-print('Voted Classifier Accuracy: ',
-      (nltk.classify.accuracy(voted_classifier, testing_set)) * 100)
+classifiers = [classifier, multinomial_classifier, bernoulli_classifier, logistic_classifier,
+               sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier, voted_classifier]
 
 
-for feature_set in feature_sets[:10]:
-    print('{} || Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier.classify(
-        feature_set[0]), voted_classifier.confidence(feature_set[0]) * 100))
+for classifier in classifiers:
+    if classifier['name'] != 'Voted Classifier':
+        classifier['classifier'].train(training_set)
+    print('{} Accuracy: {} %'.format(
+        classifier['name'], (nltk.classify.accuracy(classifier['classifier'], testing_set)) * 100))
+    if classifier['name'] == 'Voted Classifier':
+        for feature_set in feature_sets[:10]:
+            print('{} || Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
+                feature_set[0]), voted_classifier['classifier'].confidence(feature_set[0]) * 100))
+
+
+def analyze_sentiment(text):
+    feats = find_features(text)
+    for classifier in classifiers:
+        sentiment = classifier['classifier'].classify(feats)
+        conf = classifier['classifier'].confidence(feats)
+        print('Classification: {} with Confidence: {} %'.format(
+            sentiment, conf * 100))
+        return sentiment, conf
