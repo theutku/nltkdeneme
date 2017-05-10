@@ -45,27 +45,54 @@ class VoteClassifier(ClassifierI):
             return 'Confidence Draw!'
 
 
+# documents = []
+
+# for category in movie_reviews.categories():
+#     for fileid in movie_reviews.fileids(category):
+#         documents.append((list(movie_reviews.words(fileid)), category))
+
+# random.shuffle(documents)
+# # print(documents[1])
+
+# all_words = []
+
+# for word in movie_reviews.words():
+#     all_words.append(word.lower())
+
 documents = []
 
-for category in movie_reviews.categories():
-    for fileid in movie_reviews.fileids(category):
-        documents.append((list(movie_reviews.words(fileid)), category))
+short_pos = open('short_reviews/positive.txt', 'rb').read()
+short_neg = open('short_reviews/negative.txt', 'rb').read()
+
+short_pos = short_pos.decode('utf8', 'ignore')
+short_neg = short_neg.decode('utf8', 'ignore')
+
+for review in short_pos.split('\n'):
+    words = word_tokenize(review)
+    documents.append((words, 'pos'))
+
+for review in short_neg.split('\n'):
+    words = word_tokenize(review)
+    documents.append((words, 'neg'))
+
 
 random.shuffle(documents)
-# print(documents[1])
 
 all_words = []
 
-for word in movie_reviews.words():
+short_pos_words = word_tokenize(short_pos)
+short_neg_words = word_tokenize(short_neg)
+
+for word in short_pos_words:
+    all_words.append(word.lower())
+
+for word in short_neg_words:
     all_words.append(word.lower())
 
 word_freq = nltk.FreqDist(all_words)
 
-# print(word_freq.most_common(15))
-# print(word_freq['exciting'])
-
 # word_features = list(word_freq.keys())[:3000]
-word_features = [word for (word, category) in word_freq.most_common(3000)]
+word_features = [word for (word, count) in word_freq.most_common(4000)]
 
 
 def find_features(document):
@@ -81,8 +108,8 @@ feature_sets = [(find_features(rev), category)
                 for (rev, category) in documents]
 
 
-training_set = feature_sets[10:1900]
-testing_set = feature_sets[1900:]
+training_set = feature_sets[10:10000]
+testing_set = feature_sets[10000:]
 
 
 # Classifiers
