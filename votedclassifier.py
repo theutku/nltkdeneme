@@ -32,4 +32,4 @@ class VoteClassifier(ClassifierI):
             confid = float(choice_votes) / len(votes)
             return confid
         except:
-            return None
+            return 'Confidence Draw!'
