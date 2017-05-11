@@ -69,5 +69,8 @@ class ClassifierBase:
             voted_classifier['name'], (nltk.classify.accuracy(voted_classifier['classifier'], testing_set)) * 100))
 
         for feature_set in features:
+            conf = voted_classifier['classifier'].confidence(feature_set[0])
+            if type(conf) != str:
+                conf = conf * 100
             print('{} || Voted Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
-                feature_set[0]), voted_classifier['classifier'].confidence(feature_set[0]) * 100))
+                feature_set[0]), conf))
