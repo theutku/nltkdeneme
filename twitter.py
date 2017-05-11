@@ -153,7 +153,7 @@ voted_classifier = {'name': 'Voted Classifier', 'classifier': VoteClassifier(cla
                                                                              logistic_classifier, sgd_classifier, svc_classifier, linear_classifier, nusvc_classifier)}
 
 for feature_set in feature_sets[:10]:
-    print('{} || Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
+    print('{} || Voted Classification: {} with Confidence: {} %'.format(feature_set[1], voted_classifier['classifier'].classify(
         feature_set[0]), voted_classifier['classifier'].confidence(feature_set[0]) * 100))
 
 
