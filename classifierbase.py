@@ -39,9 +39,9 @@ class ClassifierBase:
                           'classifier': SklearnClassifier(SGDClassifier())}
         self._classifiers.append(sgd_classifier)
 
-        svc_classifier = {'name': 'SVC Naive Bayes Classifier',
-                          'classifier':  SklearnClassifier(SVC())}
-        self._classifiers.append(svc_classifier)
+        # svc_classifier = {'name': 'SVC Naive Bayes Classifier',
+        #                   'classifier':  SklearnClassifier(SVC())}
+        # self._classifiers.append(svc_classifier)
 
         linear_classifier = {'name': 'Linear SVC Naive Bayes Classifier',
                              'classifier': SklearnClassifier(LinearSVC())}

@@ -12,6 +12,7 @@ class WordProcessorBase(DocumentProcessorBase):
     def identify_features(self, count):
         word_features = [word for (word, count)
                          in self.word_freq.most_common(count)]
+        # word_features = list(self.word_freq.keys())[:count]
         self.word_features = word_features
 
     def find_features(self, document):

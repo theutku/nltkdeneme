@@ -21,12 +21,14 @@ class DocumentProcessorBase:
         return all_files
 
     def process_files(self, files):
-
+        allowed = ['J']
         for document in files:
             for sentence in document['file'].split('\n'):
                 self.documents.append((sentence, document['category']))
                 words = word_tokenize(sentence)
-                for word in words:
-                    self.all_words.append(word.lower())
+                pos = nltk.pos_tag(words)
+                for word in pos:
+                    if word[1][0] in allowed:
+                        self.all_words.append(word[0].lower())
 
         random.shuffle(self.documents)
