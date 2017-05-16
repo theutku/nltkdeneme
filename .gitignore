@@ -1,5 +1,5 @@
-pythonenv
 .vscode
 short_reviews
 __pycache__
 debugenv
+results

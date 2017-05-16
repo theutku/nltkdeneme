@@ -65,6 +65,8 @@ class ClassifierBase:
         voted_classifier = {'name': 'Voted Classifier',
                             'classifier': VoteClassifier(self._classifiers)}
 
+        self.voted_classifier = voted_classifier
+
         print('{} Accuracy: {} %'.format(
             voted_classifier['name'], (nltk.classify.accuracy(voted_classifier['classifier'], testing_set)) * 100))
 
