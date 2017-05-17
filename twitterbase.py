@@ -4,13 +4,23 @@ import json
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+import pickle
 
 
 class TwitterListener(StreamListener):
 
     def init_analyzer(self, example_count):
-        self.analyzer = Analyzer()
-        self.analyzer.init_analyzer(example_count)
+        # analyzer = Analyzer(example_count)
+        # # analyzer.init_analyzer(example_count)
+
+        # pickle_out_analyzer = open('analyzer.pickle', 'wb')
+        # pickle.dump(analyzer, pickle_out_analyzer)
+        # pickle_out_analyzer.close()
+
+        pickle_in_analyzer = open('analyzer.pickle', 'rb')
+        analyzer = pickle.load(pickle_in_analyzer)
+
+        self.analyzer = analyzer
 
     def init_listener(self):
         print('Initializing Twitter Stream...')
@@ -21,9 +31,6 @@ class TwitterListener(StreamListener):
 
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_token_secret)
-
-        # self.twitterStream = Stream(self.auth, self)
-        # self.twitterStream.filter(track=['happy'])
 
     def on_data(self, data):
         try:

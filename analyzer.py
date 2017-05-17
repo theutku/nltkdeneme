@@ -5,9 +5,10 @@ from votedclassifier import VoteClassifier
 
 class Analyzer:
 
-    def __init__(self):
+    def __init__(self, test_amount):
         self.word_processor = WordProcessorBase()
         self.classifier_base = ClassifierBase()
+        self.init_analyzer(test_amount)
 
     def prepare_documents(self):
         print('Preparing Raw Sample Documents...')
