@@ -6,7 +6,15 @@ from tweepy import Stream
 def init_twitter_analyzer(subject):
 
     twitter_listener = TwitterListener()
-    twitter_listener.init_analyzer(10)
+
+    try:
+        pickled_instance = open('saved/analyzer.pickle')
+        print('(Saved insatnce found. Analyzer will not be re-instantiated.)')
+        twitter_listener.init_analyzer(10)
+
+    except:
+        print('(Saved instance not found. Analyzer will be instantiated.)')
+        twitter_listener.init_analyzer(10, first_run=True)
 
     try:
         twitter_listener.init_listener()
