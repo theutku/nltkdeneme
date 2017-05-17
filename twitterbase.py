@@ -14,11 +14,11 @@ class TwitterListener(StreamListener):
             analyzer = Analyzer(example_count)
             # analyzer.init_analyzer(example_count)
 
-            pickle_out_analyzer = open('analyzer.pickle', 'wb')
+            pickle_out_analyzer = open('saved/analyzer.pickle', 'wb')
             pickle.dump(analyzer, pickle_out_analyzer)
             pickle_out_analyzer.close()
         else:
-            pickle_in_analyzer = open('analyzer.pickle', 'rb')
+            pickle_in_analyzer = open('saved/analyzer.pickle', 'rb')
             analyzer = pickle.load(pickle_in_analyzer)
 
         self.analyzer = analyzer
