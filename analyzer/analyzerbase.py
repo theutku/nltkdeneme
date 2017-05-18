@@ -1,6 +1,6 @@
-from processor import WordProcessorBase
-from classifierbase import ClassifierBase
-from votedclassifier import VoteClassifier
+from analyzer.wordprocessor.processor import WordProcessorBase
+from classifier.classifierbase import ClassifierBase
+from classifier.votedclassifier import VoteClassifier
 
 
 class Analyzer:

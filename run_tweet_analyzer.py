@@ -1,6 +1,7 @@
-from analyzer import Analyzer
-from twitterbase import TwitterListener
+from analyzer.analyzerbase import Analyzer
+from twitter.twitterbase import TwitterListener
 from tweepy import Stream
+# import classifier.plotter as plotter
 
 
 def init_twitter_analyzer(subject):
@@ -9,11 +10,11 @@ def init_twitter_analyzer(subject):
 
     try:
         pickled_instance = open('saved/analyzer.pickle')
-        print('(Saved insatnce found. Analyzer will not be re-instantiated.)')
+        print('Saved instance found. Analyzer will not be re-instantiated.')
         twitter_listener.init_analyzer(10)
 
     except:
-        print('(Saved instance not found. Analyzer will be instantiated.)')
+        print('Saved instance not found. Analyzer will be instantiated.')
         twitter_listener.init_analyzer(10, first_run=True)
 
     try:

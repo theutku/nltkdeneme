@@ -1,4 +1,4 @@
-from analyzer import Analyzer
+from analyzer.analyzerbase import Analyzer
 import json
 
 from tweepy import Stream
